@@ -1,9 +1,9 @@
-FROM ros:noetic-ros-base-focal
+FROM ros:iron-ros-base
 
 SHELL ["/bin/bash", "-c"]
 
 # set the ros version
-ENV ROS_DISTRO noetic
+ENV ROS_DISTRO iron
 
 # install some useful packages and upgrade existing ones
 RUN apt update && apt upgrade -y \
@@ -16,28 +16,47 @@ RUN apt update && apt upgrade -y \
     tmux \
     x11-apps \
     python3-pip \
-    python3-catkin-tools \
+    python3-rosdep \
     python-is-python3 \
-    libqt5websockets5-dev \
-    qt5-default
+    libqt5websockets5-dev
 
 # install ros packages
 # see ../docs/installing_ros_packages.md for alternatives
 RUN DEBIAN_FRONTEND=noninteractive apt install -y \
-    ros-${ROS_DISTRO}-rviz \
+    # ros-${ROS_DISTRO}-builtin-interfaces \
+    ros-${ROS_DISTRO}-geometry-msgs \
+    ros-${ROS_DISTRO}-std-msgs \
+    ros-${ROS_DISTRO}-tf2-msgs \
     && rm -rf /var/lib/apt/lists/*
 
-RUN rosdep update
+# install python packages
+RUN pip install inflection
 
-# switch to home dir
+# RUN rosdep init
+# RUN rosdep update
+
+# RUN mkdir -p /robofleet_client_ws/src
+# WORKDIR /robofleet_client_ws/src
+
+# # setup a package from github
+# COPY id_rsa /root/.ssh/id_rsa
+# RUN chmod 600 /root/.ssh/id_rsa
+# RUN git clone --recurse-submodules -j8 -b iron-devel https://github.com/UTNuclearRobotics/robofleet_client.git
+# RUN git clone git@github.com:UTNuclearRobotics/robofleet_client_msgs.git
+
+# # install missing dependencies
+# WORKDIR /robofleet_client_ws
+# RUN rosdep install --from-paths src -y --ignore-src
+
+# # build
+# RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
+#     && colcon build
+
+# RUN source /robofleet_client_ws/install/setup.bash \
+#     && ros2 run robofleet_client generate_plugin_pkg.py -o src tf2_msgs
+# RUN colcon build
+
 WORKDIR /root
-
-# setup a package from github
-RUN git clone https://github.com/ut-amrl/amrl_msgs.git
-RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && cd amrl_msgs \
-    && export ROS_PACKAGE_PATH=`pwd`:$ROS_PACKAGE_PATH \
-    && make -j
 
 # setup .bashrc
 SHELL ["/bin/bash", "-l", "-c"]
@@ -50,5 +69,6 @@ RUN echo -e "\
 
 # copy the entrypoint into the image
 COPY ./entrypoint.sh /entrypoint.sh
+
 # run this script on startup
 ENTRYPOINT /entrypoint.sh
