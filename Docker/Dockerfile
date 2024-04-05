@@ -23,7 +23,6 @@ RUN apt update && apt upgrade -y \
 # install ros packages
 # see ../docs/installing_ros_packages.md for alternatives
 RUN DEBIAN_FRONTEND=noninteractive apt install -y \
-    # ros-${ROS_DISTRO}-builtin-interfaces \
     ros-${ROS_DISTRO}-geometry-msgs \
     ros-${ROS_DISTRO}-std-msgs \
     ros-${ROS_DISTRO}-tf2-msgs \
