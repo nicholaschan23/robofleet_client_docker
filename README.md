@@ -1,1 +1,1 @@
-This Docker is for the [Robofleet Client](https://github.com/UTNuclearRobotics/robofleet_client) repository. Follow that repository's intructions to create a `robofleet_client_ws` directory.
+This Docker is for the [Robofleet Client](https://github.com/UTNuclearRobotics/robofleet_client) repository. Follow that repository's intructions to create a `robofleet_client_ws` directory (a volume is created to mirror this directory inside the container).
